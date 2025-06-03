@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link.js";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,8 +19,9 @@ const authFormSchema = (type: FormType) =>
     password: z.string().min(3),
   });
 
-const AuthForm = ({ type }: { type: FormType }) => {
+export default function AuthForm({ type }: { type: FormType }) {
   const formSchema = authFormSchema(type);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,8 +35,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (type === "sign-up") {
+        toast.success("Account created successfully. Please sign in.");
+        router.push("/sign-in");
         console.log("sign up", values);
       } else {
+        toast.success("Signed in successfully.");
+        router.push("/");
         console.log("sign in", values);
       }
     } catch (error) {
@@ -52,7 +58,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
           <Image src="/logo.svg" alt="logo" width={38} height={32} />
           <h2 className="text-primary-100">Prep AI</h2>
         </div>
-        <h3>Practice job interview with AI</h3>
+
+        <h3 className="text-center text-2xl font-bold underline">
+          Practice job interview with AI
+        </h3>
 
         <Form {...form}>
           <form
@@ -65,6 +74,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
                 name="name"
                 label="Name"
                 placeholder="Enter your name"
+                type="text"
               />
             )}
             <FormField
@@ -79,6 +89,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               name="password"
               label="Password"
               placeholder="Your password"
+              type="password"
             />
             <Button type="submit" className="btn">
               {isSignIn ? "Sign in" : "Sign up"}
@@ -97,6 +108,4 @@ const AuthForm = ({ type }: { type: FormType }) => {
       </div>
     </div>
   );
-};
-
-export default AuthForm;
+}
